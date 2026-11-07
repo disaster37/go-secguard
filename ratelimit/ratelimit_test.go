@@ -1,6 +1,7 @@
 package ratelimit
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -92,6 +93,42 @@ func TestRateLimiterWindowFallback(t *testing.T) {
 	clock.Advance(domain.DefaultRateLimitWindow + time.Second)
 	if !rl.Allow("a", 1, -time.Second) {
 		t.Fatal("request after default window should be allowed")
+	}
+}
+
+func TestRateLimiterAllowClampsMaxRequests(t *testing.T) {
+	t.Parallel()
+
+	clock := testutil.NewFakeClock(time.Unix(0, 0))
+	rl := NewRateLimiter(10, clock.Now)
+
+	// A zero/negative maxRequests must be clamped to DefaultRateLimitMax rather
+	// than interpreted as "deny all", which would also grow the map unboundedly.
+	for i := 0; i < domain.DefaultRateLimitMax; i++ {
+		if !rl.Allow("a", 0, time.Minute) {
+			t.Fatalf("request %d should be allowed", i)
+		}
+	}
+	if rl.Allow("a", 0, time.Minute) {
+		t.Fatal("request over the default limit should be denied")
+	}
+	if rl.Allow("a", -1, time.Minute) {
+		t.Fatal("negative maxRequests should clamp to the default limit")
+	}
+}
+
+func TestRateLimiterAllowZeroMaxRequestsBounded(t *testing.T) {
+	t.Parallel()
+
+	clock := testutil.NewFakeClock(time.Unix(0, 0))
+	rl := NewRateLimiter(10, clock.Now)
+
+	// Even with a zero maxRequests, the map must stay bounded by max.
+	for i := 0; i < 100; i++ {
+		rl.Allow(fmt.Sprintf("key-%d", i), 0, time.Minute)
+	}
+	if rl.Len() > 10 {
+		t.Fatalf("Len() = %d, want <= 10", rl.Len())
 	}
 }
 

@@ -1035,7 +1035,7 @@ func ClampWindow(window, fallback time.Duration) time.Duration
 ClampWindow returns window when positive, or fallback \(or DefaultLoginThrottleWindow when fallback \<= 0\).
 
 <a name="LoginThrottle"></a>
-## type [LoginThrottle](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L133-L139>)
+## type [LoginThrottle](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L92-L98>)
 
 LoginThrottle is a bounded sliding\-window per\-account login attempt limiter.
 
@@ -1046,7 +1046,7 @@ type LoginThrottle struct {
 ```
 
 <a name="NewLoginThrottle"></a>
-### func [NewLoginThrottle](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L142>)
+### func [NewLoginThrottle](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L101>)
 
 ```go
 func NewLoginThrottle(maxEntries int, clock func() time.Time) *LoginThrottle
@@ -1055,7 +1055,7 @@ func NewLoginThrottle(maxEntries int, clock func() time.Time) *LoginThrottle
 NewLoginThrottle returns a LoginThrottle bounded to maxEntries keys.
 
 <a name="LoginThrottle.Allow"></a>
-### func \(\*LoginThrottle\) [Allow](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L154>)
+### func \(\*LoginThrottle\) [Allow](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L113>)
 
 ```go
 func (lt *LoginThrottle) Allow(key string, maxAttempts int, window time.Duration) bool
@@ -1064,7 +1064,7 @@ func (lt *LoginThrottle) Allow(key string, maxAttempts int, window time.Duration
 Allow reports whether key may attempt another login within window. When maxAttempts \<= 0, DefaultLoginThrottleAttempts is used.
 
 <a name="LoginThrottle.Clear"></a>
-### func \(\*LoginThrottle\) [Clear](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L186>)
+### func \(\*LoginThrottle\) [Clear](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L138>)
 
 ```go
 func (lt *LoginThrottle) Clear(key string)
@@ -1073,7 +1073,7 @@ func (lt *LoginThrottle) Clear(key string)
 Clear resets the throttle state for key after a successful login.
 
 <a name="LoginThrottle.Len"></a>
-### func \(\*LoginThrottle\) [Len](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L205>)
+### func \(\*LoginThrottle\) [Len](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L157>)
 
 ```go
 func (lt *LoginThrottle) Len() int
@@ -1082,7 +1082,7 @@ func (lt *LoginThrottle) Len() int
 Len returns the current number of tracked keys.
 
 <a name="LoginThrottle.Sweep"></a>
-### func \(\*LoginThrottle\) [Sweep](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L193>)
+### func \(\*LoginThrottle\) [Sweep](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L145>)
 
 ```go
 func (lt *LoginThrottle) Sweep(window time.Duration)
@@ -1111,16 +1111,16 @@ func NewRateLimiter(maxEntries int, clock func() time.Time) *RateLimiter
 NewRateLimiter returns a RateLimiter bounded to maxEntries keys.
 
 <a name="RateLimiter.Allow"></a>
-### func \(\*RateLimiter\) [Allow](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L47>)
+### func \(\*RateLimiter\) [Allow](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L48>)
 
 ```go
 func (rl *RateLimiter) Allow(key string, maxRequests int, window time.Duration) bool
 ```
 
-Allow reports whether key may make another request within window \(clamped via ClampWindow\).
+Allow reports whether key may make another request within window \(clamped via ClampWindow\). When maxRequests \<= 0, DefaultRateLimitMax is used so a zero or negative limit cannot turn the limiter into an unbounded "deny all" map.
 
 <a name="RateLimiter.Len"></a>
-### func \(\*RateLimiter\) [Len](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L88>)
+### func \(\*RateLimiter\) [Len](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L85>)
 
 ```go
 func (rl *RateLimiter) Len() int
@@ -1129,7 +1129,7 @@ func (rl *RateLimiter) Len() int
 Len returns the current number of tracked keys.
 
 <a name="RateLimiter.Sweep"></a>
-### func \(\*RateLimiter\) [Sweep](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L76>)
+### func \(\*RateLimiter\) [Sweep](<https://github.com/disaster37/go-secguard/blob/main/ratelimit/ratelimit.go#L73>)
 
 ```go
 func (rl *RateLimiter) Sweep(window time.Duration)

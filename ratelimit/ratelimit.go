@@ -43,8 +43,12 @@ func NewRateLimiter(maxEntries int, clock func() time.Time) *RateLimiter {
 }
 
 // Allow reports whether key may make another request within window (clamped via
-// ClampWindow).
+// ClampWindow). When maxRequests <= 0, DefaultRateLimitMax is used so a zero or
+// negative limit cannot turn the limiter into an unbounded "deny all" map.
 func (rl *RateLimiter) Allow(key string, maxRequests int, window time.Duration) bool {
+	if maxRequests <= 0 {
+		maxRequests = domain.DefaultRateLimitMax
+	}
 	window = ClampWindow(window, domain.DefaultRateLimitWindow)
 
 	rl.mu.Lock()
